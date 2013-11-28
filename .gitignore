@@ -152,3 +152,5 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/Fenske.Druglike.Test/bin/Debug/OBDotNet.dll
+/Fenske.Druglike/bin/Debug/OBDotNet.dll

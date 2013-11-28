@@ -38,7 +38,7 @@
   <ItemGroup>
     <Reference Include="OBDotNet, Version=0.4.0.0, Culture=neutral, PublicKeyToken=3069c9c4f488e4bd, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files (x86)\OpenBabel-2.3.2\OBDotNet.dll</HintPath>
+      <HintPath>..\Fenske.Druglike\Dependencies\OBDotNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
