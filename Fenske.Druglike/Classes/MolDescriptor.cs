@@ -13,19 +13,15 @@ namespace OBDescriptorExtension
     {
         #region Private variables
 
-        private OBMol _mol;
+        private OBMolExtended _mol;
         private IDictionary<string, int> _fragmentCounts;
-        private double[] _vsaEState;
-        private double[] _eStateVsa;
-        private double[] _peoeVsa;
-        private double[] _smrVsa;
-        private double[] _sLogPVsa;
+        
 
         #endregion
 
         #region Properties
 
-        private OBMol Mol
+        private OBMolExtended ExtendedMol
         {
             get { return this._mol; }
         }
@@ -35,7 +31,7 @@ namespace OBDescriptorExtension
         /// </summary>
         public string Title
         {
-            get { return this.Mol.GetTitle(); }
+            get { return this.ExtendedMol.Mol.GetTitle(); }
         }
 
         /// <summary>
@@ -47,7 +43,7 @@ namespace OBDescriptorExtension
             {
                 var converter = new OBConversion();
                 converter.SetOutFormat("smi");
-                return converter.WriteString(this.Mol).Replace(this.Title, string.Empty).Trim();
+                return converter.WriteString(this.ExtendedMol.Mol).Replace(this.Title, string.Empty).Trim();
             }
         }
 
@@ -57,7 +53,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Molecular Weight")]
         public double MolWt
         {
-            get { return this.Mol.GetMolWt(); }
+            get { return this.ExtendedMol.Mol.GetMolWt(); }
         }
 
         /// <summary>
@@ -66,7 +62,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Number Rings")]
         public int NumRings
         {
-            get { return this.Mol.GetSSSR().Count; }
+            get { return this.ExtendedMol.Mol.GetSSSR().Count; }
         }
 
         /// <summary>
@@ -77,7 +73,7 @@ namespace OBDescriptorExtension
         {
             get 
             {
-                var newMol = this.Mol.AssignGasteigerCharges();
+                var newMol = this.ExtendedMol.Mol.AssignGasteigerCharges();
                 return newMol.Atoms().Select(a => a.GetPartialCharge()).Sum();
             }
         }
@@ -88,7 +84,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Total Spin Multiplicity")]
         public uint TotalSpinMultiplicity
         {
-            get { return this.Mol.GetTotalSpinMultiplicity(); }
+            get { return this.ExtendedMol.Mol.GetTotalSpinMultiplicity(); }
         }
 
         /// <summary>
@@ -97,7 +93,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Number Conformers")]
         public int NumConformers
         {
-            get { return this.Mol.NumConformers(); }
+            get { return this.ExtendedMol.Mol.NumConformers(); }
         }
 
         /// <summary>
@@ -106,7 +102,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Least Conformer Energy")]
         public double LeastConformerEnergy
         {
-            get { return this.Mol.GetEnergies().Min(); }
+            get { return this.ExtendedMol.Mol.GetEnergies().Min(); }
         }
 
         /// <summary>
@@ -115,7 +111,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Heat of Formation")]
         public double HeatOfFormation
         {
-            get { return this.Mol.GetEnergy(); }
+            get { return this.ExtendedMol.Mol.GetEnergy(); }
         }
 
         /// <summary>
@@ -124,7 +120,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Number Atoms")]
         public uint NumAtoms
         {
-            get { return this.Mol.NumAtoms(); }
+            get { return this.ExtendedMol.Mol.NumAtoms(); }
         }
 
         /// <summary>
@@ -133,7 +129,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Number Heavy Atoms")]
         public uint NumHeavyAtoms
         {
-            get { return this.Mol.NumHvyAtoms(); }
+            get { return this.ExtendedMol.Mol.NumHvyAtoms(); }
         }
 
         /// <summary>
@@ -142,7 +138,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Number Rotatable Bonds")]
         public uint RotatableBonds
         {
-            get { return this.Mol.NumRotors(); }
+            get { return this.ExtendedMol.Mol.NumRotors(); }
         }
 
         /// <summary>
@@ -151,7 +147,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Number Bonds")]
         public uint NumBonds
         {
-            get { return this.Mol.NumBonds(); }
+            get { return this.ExtendedMol.Mol.NumBonds(); }
         }
 
         /// <summary>
@@ -294,20 +290,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Labute ASA")]
         public double LabuteASA
         {
-            get { return this.Mol.LabuteAsa(); }
-        }
-        /// <summary>
-        /// Gives the PEOE contribution for the given charge bin
-        /// </summary>
-        /// <param name="idx">charge bin</param>
-        /// <returns>double</returns>
-        private double PeoeVSA(int idx)
-        {
-            if (this._peoeVsa == null)
-            {
-                this._peoeVsa = this.Mol.PeoeVsaContributions();
-            }
-            return this._peoeVsa[idx];
+            get { return this.ExtendedMol.LabuteAsaContributions.Sum(); }
         }
 
         /// <summary>
@@ -316,7 +299,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 1")]
         public double PeoeVSA1
         {
-            get { return this.PeoeVSA(0); }
+            get { return this.ExtendedMol.PeoeVsa[0]; }
         }
 
         /// <summary>
@@ -325,7 +308,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 2")]
         public double PeoeVSA2
         {
-            get { return this.PeoeVSA(1); }
+            get { return this.ExtendedMol.PeoeVsa[1]; }
         }
 
         /// <summary>
@@ -334,7 +317,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 3")]
         public double PeoeVSA3
         {
-            get { return this.PeoeVSA(2); }
+            get { return this.ExtendedMol.PeoeVsa[2]; }
         }
 
         /// <summary>
@@ -343,7 +326,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 4")]
         public double PeoeVSA4
         {
-            get { return this.PeoeVSA(3); }
+            get { return this.ExtendedMol.PeoeVsa[3]; }
         }
 
         /// <summary>
@@ -352,7 +335,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 5")]
         public double PeoeVSA5
         {
-            get { return this.PeoeVSA(4); }
+            get { return this.ExtendedMol.PeoeVsa[4]; }
         }
 
         /// <summary>
@@ -361,7 +344,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 6")]
         public double PeoeVSA6
         {
-            get { return this.PeoeVSA(5); }
+            get { return this.ExtendedMol.PeoeVsa[5]; }
         }
 
         /// <summary>
@@ -370,7 +353,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 7")]
         public double PeoeVSA7
         {
-            get { return this.PeoeVSA(6); }
+            get { return this.ExtendedMol.PeoeVsa[6]; }
         }
 
         /// <summary>
@@ -379,7 +362,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 8")]
         public double PeoeVSA8
         {
-            get { return this.PeoeVSA(7); }
+            get { return this.ExtendedMol.PeoeVsa[7]; }
         }
 
         /// <summary>
@@ -388,7 +371,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 9")]
         public double PeoeVSA9
         {
-            get { return this.PeoeVSA(8); }
+            get { return this.ExtendedMol.PeoeVsa[8]; }
         }
 
         /// <summary>
@@ -397,7 +380,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 10")]
         public double PeoeVSA10
         {
-            get { return this.PeoeVSA(9); }
+            get { return this.ExtendedMol.PeoeVsa[9]; }
         }
 
         /// <summary>
@@ -406,7 +389,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 11")]
         public double PeoeVSA11
         {
-            get { return this.PeoeVSA(10); }
+            get { return this.ExtendedMol.PeoeVsa[10]; }
         }
 
         /// <summary>
@@ -415,7 +398,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 12")]
         public double PeoeVSA12
         {
-            get { return this.PeoeVSA(11); }
+            get { return this.ExtendedMol.PeoeVsa[11]; }
         }
 
         /// <summary>
@@ -424,7 +407,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 13")]
         public double PeoeVSA13
         {
-            get { return this.PeoeVSA(12); }
+            get { return this.ExtendedMol.PeoeVsa[12]; }
         }
 
         /// <summary>
@@ -433,21 +416,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "PEOE VSA 14")]
         public double PeoeVSA14
         {
-            get { return this.PeoeVSA(13); }
-        }
-
-        /// <summary>
-        /// Gives the MR contribution for the given molar refractivity bin
-        /// </summary>
-        /// <param name="idx">int</param>
-        /// <returns>double</returns>
-        private double SmrVSA(int idx)
-        {
-            if (this._smrVsa == null)
-            {
-                this._smrVsa = this.Mol.LabuteSmrVSA();
-            }
-            return this._smrVsa[idx];
+            get { return this.ExtendedMol.PeoeVsa[13]; }
         }
 
         /// <summary>
@@ -456,7 +425,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 1")]
         public double SmrVSA1
         {
-            get { return this.SmrVSA(0); }
+            get { return this.ExtendedMol.SmrVsa[0]; }
         }
 
         /// <summary>
@@ -465,7 +434,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 2")]
         public double SmrVSA2
         {
-            get { return this.SmrVSA(1); }
+            get { return this.ExtendedMol.SmrVsa[1]; }
         }
 
         /// <summary>
@@ -474,7 +443,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 3")]
         public double SmrVSA3
         {
-            get { return this.SmrVSA(2); }
+            get { return this.ExtendedMol.SmrVsa[2]; }
         }
 
         /// <summary>
@@ -483,7 +452,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 4")]
         public double SmrVSA4
         {
-            get { return this.SmrVSA(3); }
+            get { return this.ExtendedMol.SmrVsa[3]; }
         }
 
         /// <summary>
@@ -492,7 +461,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 5")]
         public double SmrVSA5
         {
-            get { return this.SmrVSA(4); }
+            get { return this.ExtendedMol.SmrVsa[4]; }
         }
 
         /// <summary>
@@ -501,7 +470,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 6")]
         public double SmrVSA6
         {
-            get { return this.SmrVSA(5); }
+            get { return this.ExtendedMol.SmrVsa[5]; }
         }
 
         /// <summary>
@@ -510,7 +479,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 7")]
         public double SmrVSA7
         {
-            get { return this.SmrVSA(6); }
+            get { return this.ExtendedMol.SmrVsa[6]; }
         }
 
         /// <summary>
@@ -519,7 +488,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 8")]
         public double SmrVSA8
         {
-            get { return this.SmrVSA(7); }
+            get { return this.ExtendedMol.SmrVsa[7]; }
         }
 
         /// <summary>
@@ -528,7 +497,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 9")]
         public double SmrVSA9
         {
-            get { return this.SmrVSA(8); }
+            get { return this.ExtendedMol.SmrVsa[8]; }
         }
 
         /// <summary>
@@ -537,7 +506,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SMR VSA 10")]
         public double SmrVSA10
         {
-            get { return this.SmrVSA(9); }
+            get { return this.ExtendedMol.SmrVsa[9]; }
         }
 
         /// <summary>
@@ -546,7 +515,7 @@ namespace OBDescriptorExtension
         [Feature(Name="VSA EState 1")]
         public double VsaEState1
         {
-            get { return this.VsaEState(0); }
+            get { return this.ExtendedMol.VsaEState[0]; }
         }
 
         /// <summary>
@@ -555,7 +524,7 @@ namespace OBDescriptorExtension
         [Feature(Name="VSA EState 2")]
         public double VsaEState2
         {
-            get { return this.VsaEState(1); }
+            get { return this.ExtendedMol.VsaEState[1]; }
         }
 
         /// <summary>
@@ -564,7 +533,7 @@ namespace OBDescriptorExtension
         [Feature(Name="VSA EState 3")]
         public double VsaEState3
         {
-            get { return this.VsaEState(2); }
+            get { return this.ExtendedMol.VsaEState[2]; }
         }
 
         /// <summary>
@@ -573,7 +542,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 4")]
         public double VsaEState4
         {
-            get { return this.VsaEState(3); }
+            get { return this.ExtendedMol.VsaEState[3]; }
         }
 
         /// <summary>
@@ -582,7 +551,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 5")]
         public double VsaEState5
         {
-            get { return this.VsaEState(4); }
+            get { return this.ExtendedMol.VsaEState[4]; }
         }
 
         /// <summary>
@@ -591,7 +560,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 6")]
         public double VsaEState6
         {
-            get { return this.VsaEState(5); }
+            get { return this.ExtendedMol.VsaEState[5]; }
         }
 
         /// <summary>
@@ -600,7 +569,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 7")]
         public double VsaEState7
         {
-            get { return this.VsaEState(6); }
+            get { return this.ExtendedMol.VsaEState[6]; }
         }
 
         /// <summary>
@@ -609,7 +578,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 8")]
         public double VsaEState8
         {
-            get { return this.VsaEState(7); }
+            get { return this.ExtendedMol.VsaEState[7]; }
         }
 
         /// <summary>
@@ -618,7 +587,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 9")]
         public double VsaEState9
         {
-            get { return this.VsaEState(8); }
+            get { return this.ExtendedMol.VsaEState[8]; }
         }
 
         /// <summary>
@@ -627,7 +596,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 10")]
         public double VsaEState10
         {
-            get { return this.VsaEState(9); }
+            get { return this.ExtendedMol.VsaEState[9]; }
         }
 
         /// <summary>
@@ -636,21 +605,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "VSA EState 11")]
         public double VsaEState11
         {
-            get { return this.VsaEState(10); }
-        }
-
-        /// <summary>
-        /// Gives the LogP contribution for the given logP bin
-        /// </summary>
-        /// <param name="idx">int</param>
-        /// <returns>double</returns>
-        private double SLogPVSA(int idx)
-        {
-            if (this._sLogPVsa == null)
-            {
-                this._sLogPVsa = this.Mol.LabuteSLogPVSA();
-            }
-            return this._sLogPVsa[idx];
+            get { return this.ExtendedMol.VsaEState[10]; }
         }
 
         /// <summary>
@@ -659,7 +614,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 1")]
         public double SLogPVSA1
         {
-            get { return this.SLogPVSA(0); }
+            get { return this.ExtendedMol.SLogPVsa[0]; }
         }
 
         /// <summary>
@@ -668,7 +623,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 2")]
         public double SLogPVSA2
         {
-            get { return this.SLogPVSA(1); }
+            get { return this.ExtendedMol.SLogPVsa[1]; }
         }
 
         /// <summary>
@@ -677,7 +632,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 3")]
         public double SLogPVSA3
         {
-            get { return this.SLogPVSA(2); }
+            get { return this.ExtendedMol.SLogPVsa[2]; }
         }
 
         /// <summary>
@@ -686,7 +641,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 4")]
         public double SLogPVSA4
         {
-            get { return this.SLogPVSA(3); }
+            get { return this.ExtendedMol.SLogPVsa[3]; }
         }
 
         /// <summary>
@@ -695,7 +650,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 5")]
         public double SLogPVSA5
         {
-            get { return this.SLogPVSA(4); }
+            get { return this.ExtendedMol.SLogPVsa[4]; }
         }
 
         /// <summary>
@@ -704,7 +659,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 6")]
         public double SLogPVSA6
         {
-            get { return this.SLogPVSA(5); }
+            get { return this.ExtendedMol.SLogPVsa[5]; }
         }
 
         /// <summary>
@@ -713,7 +668,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 7")]
         public double SLogPVSA7
         {
-            get { return this.SLogPVSA(6); }
+            get { return this.ExtendedMol.SLogPVsa[6]; }
         }
 
         /// <summary>
@@ -722,7 +677,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 8")]
         public double SLogPVSA8
         {
-            get { return this.SLogPVSA(7); }
+            get { return this.ExtendedMol.SLogPVsa[7]; }
         }
 
         /// <summary>
@@ -731,7 +686,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 9")]
         public double SLogPVSA9
         {
-            get { return this.SLogPVSA(8); }
+            get { return this.ExtendedMol.SLogPVsa[8]; }
         }
 
         /// <summary>
@@ -740,7 +695,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 10")]
         public double SLogPVSA10
         {
-            get { return this.SLogPVSA(9); }
+            get { return this.ExtendedMol.SLogPVsa[9]; }
         }
 
         /// <summary>
@@ -749,7 +704,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 11")]
         public double SLogPVSA11
         {
-            get { return this.SLogPVSA(10); }
+            get { return this.ExtendedMol.SLogPVsa[10]; }
         }
 
         /// <summary>
@@ -758,7 +713,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "SLogP VSA 12")]
         public double SLogPVSA12
         {
-            get { return this.SLogPVSA(11); }
+            get { return this.ExtendedMol.SLogPVsa[11]; }
         }
 
         /// <summary>
@@ -767,7 +722,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 1")]
         public double EStateVsa1
         {
-            get { return this.EStateVsa(0); }
+            get { return this.ExtendedMol.EStateVsa[0]; }
         }
 
         /// <summary>
@@ -776,7 +731,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 2")]
         public double EStateVsa2
         {
-            get { return this.EStateVsa(1); }
+            get { return this.ExtendedMol.EStateVsa[1]; }
         }
 
         /// <summary>
@@ -785,7 +740,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 3")]
         public double EStateVsa3
         {
-            get { return this.EStateVsa(2); }
+            get { return this.ExtendedMol.EStateVsa[2]; }
         }
 
         /// <summary>
@@ -794,7 +749,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 4")]
         public double EStateVsa4
         {
-            get { return this.EStateVsa(3); }
+            get { return this.ExtendedMol.EStateVsa[3]; }
         }
 
         /// <summary>
@@ -803,7 +758,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 5")]
         public double EStateVsa5
         {
-            get { return this.EStateVsa(4); }
+            get { return this.ExtendedMol.EStateVsa[4]; }
         }
 
         /// <summary>
@@ -812,7 +767,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 6")]
         public double EStateVsa6
         {
-            get { return this.EStateVsa(5); }
+            get { return this.ExtendedMol.EStateVsa[5]; }
         }
 
         /// <summary>
@@ -821,7 +776,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 7")]
         public double EStateVsa7
         {
-            get { return this.EStateVsa(6); }
+            get { return this.ExtendedMol.EStateVsa[6]; }
         }
 
         /// <summary>
@@ -830,7 +785,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 8")]
         public double EStateVsa8
         {
-            get { return this.EStateVsa(7); }
+            get { return this.ExtendedMol.EStateVsa[7]; }
         }
 
         /// <summary>
@@ -839,7 +794,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 9")]
         public double EStateVsa9
         {
-            get { return this.EStateVsa(8); }
+            get { return this.ExtendedMol.EStateVsa[8]; }
         }
 
         /// <summary>
@@ -848,7 +803,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 10")]
         public double EStateVsa10
         {
-            get { return this.EStateVsa(9); }
+            get { return this.ExtendedMol.EStateVsa[9]; }
         }
 
         /// <summary>
@@ -857,7 +812,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "EState VSA 11")]
         public double EStateVsa11
         {
-            get { return this.EStateVsa(10); }
+            get { return this.ExtendedMol.EStateVsa[10]; }
         }
 
         /// <summary>
@@ -866,7 +821,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi0")]
         public double Chi0
         {
-            get { return this.Mol.Chi0(); }
+            get { return this.ExtendedMol.Mol.Chi0(); }
         }
 
         /// <summary>
@@ -875,7 +830,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi1")]
         public double Chi1
         {
-            get { return this.Mol.Chi1(); }
+            get { return this.ExtendedMol.Mol.Chi1(); }
         }
 
         /// <summary>
@@ -884,7 +839,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi0v")]
         public double Chi0v
         {
-            get { return this.Mol.Chi0v(); }
+            get { return this.ExtendedMol.Mol.Chi0v(); }
         }
 
         /// <summary>
@@ -893,7 +848,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi1v")]
         public double Chi1v
         {
-            get { return this.Mol.Chi1v(); }
+            get { return this.ExtendedMol.Mol.Chi1v(); }
         }
 
         /// <summary>
@@ -902,7 +857,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi2v")]
         public double Chi2v
         {
-            get { return this.Mol.ChiNv(2); }
+            get { return this.ExtendedMol.ChiNv(2); }
         }
 
         /// <summary>
@@ -911,7 +866,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi3v")]
         public double Chi3v
         {
-            get { return this.Mol.ChiNv(3); }
+            get { return this.ExtendedMol.ChiNv(3); }
         }
 
         /// <summary>
@@ -920,7 +875,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi4v")]
         public double Chi4v
         {
-            get { return this.Mol.ChiNv(4); }
+            get { return this.ExtendedMol.ChiNv(4); }
         }
 
         /// <summary>
@@ -929,7 +884,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi0n")]
         public double Chi0n
         {
-            get { return this.Mol.Chi0n(); }
+            get { return this.ExtendedMol.Mol.Chi0n(); }
         }
 
         /// <summary>
@@ -938,7 +893,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi1n")]
         public double Chi1n
         {
-            get { return this.Mol.Chi1n(); }
+            get { return this.ExtendedMol.Mol.Chi1n(); }
         }
 
         /// <summary>
@@ -947,7 +902,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Chi2n")]
         public double Chi2n
         {
-            get { return this.Mol.ChiNn(2); }
+            get { return this.ExtendedMol.ChiNn(2); }
         }
 
         /// <summary>
@@ -956,7 +911,7 @@ namespace OBDescriptorExtension
         [Feature(Name="Chi3n")]
         public double Chi3n
         {
-            get { return this.Mol.ChiNn(3); }
+            get { return this.ExtendedMol.ChiNn(3); }
         }
 
         /// <summary>
@@ -965,7 +920,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Chi4n")]
         public double Chi4n
         {
-            get { return this.Mol.ChiNn(4); }
+            get { return this.ExtendedMol.ChiNn(4); }
         }
 
         /// <summary>
@@ -974,7 +929,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Hall-Kier Alpha")]
         public double HallKierAlpha
         {
-            get { return this.Mol.HallKierAlpha(); }
+            get { return this.ExtendedMol.HallKierAlpha; }
         }
 
         /// <summary>
@@ -983,7 +938,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Kappa1")]
         public double Kappa1
         {
-            get { return this.Mol.Kappa1(); }
+            get { return this.ExtendedMol.Kappa1; }
         }
 
         /// <summary>
@@ -992,7 +947,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Kappa2")]
         public double Kappa2
         {
-            get { return this.Mol.Kappa2(); }
+            get { return this.ExtendedMol.Kappa2; }
         }
 
         /// <summary>
@@ -1001,7 +956,7 @@ namespace OBDescriptorExtension
         [Feature(Name = "Kappa3")]
         public double Kappa3
         {
-            get { return this.Mol.Kappa3(); }
+            get { return this.ExtendedMol.Kappa3; }
         }
 
         /// <summary>
@@ -1011,13 +966,13 @@ namespace OBDescriptorExtension
         [Feature(Name = "Ipc")]
         public double Ipc
         {
-            get { return this.Mol.Ipc(); }
+            get { return this.ExtendedMol.Ipc(); }
         }
 
         [Feature(Name = "BalabanJ")]
         public double BalabanJ
         {
-            get { return this.Mol.BalabanJ(); }
+            get { return this.ExtendedMol.BalabanJ; }
         }
 
         #endregion
@@ -1058,7 +1013,7 @@ namespace OBDescriptorExtension
         {
             var newMol = new OBMol(mol);
             newMol.DeleteHydrogens();
-            this._mol = newMol;
+            this._mol = new OBMolExtended(newMol);
         }
 
         #endregion
@@ -1073,7 +1028,7 @@ namespace OBDescriptorExtension
         private double PredictProperty(string propertyName)
         {
             var descriptor = OBDescriptor.FindType(propertyName);
-            return descriptor.Predict(this.Mol);
+            return descriptor.Predict(this.ExtendedMol.Mol);
         }
 
         /// <summary>
@@ -1083,7 +1038,7 @@ namespace OBDescriptorExtension
         /// <returns></returns>
         public int FragmentCount(string smarts)
         {
-            return this.Mol.SmartPatternCount(smarts);
+            return this.ExtendedMol.Mol.SmartPatternCount(smarts);
         }
 
         /// <summary>
@@ -1107,35 +1062,6 @@ namespace OBDescriptorExtension
                 }
             }
             return new OBDescriptorExtension.FeatureValue(featureName,Convert.ToDouble(property.GetValue(this, null)));
-        }
-
-        /// <summary>
-        /// Calculates VSA EState of a molecule
-        /// </summary>
-        private double VsaEState(int index)
-        {
-            var length = BinConstants.EStateBins.Length + 1;
-            if (index < 1 || index > length)
-            {
-                throw new ArgumentOutOfRangeException(string.Format("Index not between 1 and {0}", length));
-            }
-            if (this._vsaEState == null)
-            {
-                this._vsaEState = this.Mol.VsaEState();
-            }
-            return this._vsaEState[index];
-        }
-
-        /// <summary>
-        /// Calculate EState VSA of a molecule
-        /// </summary>
-        private double EStateVsa(int index)
-        {
-            if (this._eStateVsa == null)
-            {
-                this._eStateVsa = this.Mol.EStateVsa();
-            }
-            return this._eStateVsa[index];
         }
 
         /// <summary>

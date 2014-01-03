@@ -49,6 +49,7 @@
     <Compile Include="Classes\FeatureValue.cs" />
     <Compile Include="Classes\FeatureValues.cs" />
     <Compile Include="Classes\Matrix.cs" />
+    <Compile Include="Classes\OBMolExtended.cs" />
     <Compile Include="Classes\PathComparer.cs" />
     <Compile Include="Classes\Search.cs" />
     <Compile Include="Constants\AtomicConstants.cs" />

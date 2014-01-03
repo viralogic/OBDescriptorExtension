@@ -6,7 +6,7 @@ using OpenBabel;
 
 namespace OBDescriptorExtension
 {
-    class FloydWarshall
+    public class FloydWarshall
     {
         #region Privates
 

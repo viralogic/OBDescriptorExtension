@@ -684,25 +684,13 @@ namespace OBDescriptorExtension.Test
         }
 
         [TestMethod]
-        public void CrippenVsaTest()
-        {
-            var mol = new MolReader(FileNames.AnisoleFilePath).GetMol();
-            Assert.AreEqual(34.66, Math.Round(mol.CrippenSmrVSA(), 2));
-            Assert.AreEqual(1.40, Math.Round(mol.CrippenSLogPVSA(), 2));
-
-            mol = new MolReader(FileNames.PyridineFilePath).GetMol();
-            Assert.AreEqual(49.67, Math.Round(mol.CrippenSmrVSA(), 2));
-            Assert.AreEqual(2.75, Math.Round(mol.CrippenSLogPVSA(), 2));
-        }
-
-        [TestMethod]
         public void DistanceMatrixTest()
         {
             var converter = new OBConversion();
             converter.SetInFormat("smi");
             var mol = new OBMol();
             converter.ReadString(mol, "CC=C");
-            var dMat = mol.DistanceMatrix();
+            var dMat = new FloydWarshall(mol, false, false).DistanceMatrix;
             Assert.AreEqual(0d, dMat.Get(0,0));
             Assert.AreEqual(1d, dMat.Get(0,1));
             Assert.AreEqual(2d, dMat.Get(0,2));
@@ -713,7 +701,7 @@ namespace OBDescriptorExtension.Test
             Assert.AreEqual(1d, dMat.Get(2,1));
             Assert.AreEqual(0d, dMat.Get(2,2));
 
-            dMat = mol.DistanceMatrix(useBondOrder: true);
+            dMat = new FloydWarshall(mol, true, false).DistanceMatrix;
             Assert.AreEqual(0d, dMat.Get(0, 0));
             Assert.AreEqual(1d, dMat.Get(0, 1));
             Assert.AreEqual(1.5, dMat.Get(0, 2));
@@ -748,46 +736,13 @@ namespace OBDescriptorExtension.Test
         }
 
         [TestMethod]
-        public void EStateIndiceTest()
-        {
-            var converter = new OBConversion();
-            converter.SetInFormat("smi");
-            var mol = new OBMol();
-            converter.ReadString(mol, "CCCC");
-            var eStateIndices = mol.EStateIndices();
-            // 2.18,1.32,1.32,2.18
-            Assert.AreEqual(2.18, Math.Round(eStateIndices[0], 2));
-            Assert.AreEqual(1.32, Math.Round(eStateIndices[1], 2));
-            Assert.AreEqual(1.32, Math.Round(eStateIndices[2], 2));
-            Assert.AreEqual(2.18, Math.Round(eStateIndices[3], 2));
-
-            // 1.85,0.22,1.85,-0.19,11.11
-            converter.ReadString(mol, "CC(C)CF");
-            eStateIndices = mol.EStateIndices();
-            Assert.AreEqual(1.85, Math.Round(eStateIndices[0], 2));
-            Assert.AreEqual(0.22, Math.Round(eStateIndices[1], 2));
-            Assert.AreEqual(1.85, Math.Round(eStateIndices[2], 2));
-            Assert.AreEqual(-0.19, Math.Round(eStateIndices[3], 2));
-            Assert.AreEqual(11.12, Math.Round(eStateIndices[4], 2));
-
-            converter.ReadString(mol, "CCOCC");
-            eStateIndices = mol.EStateIndices();
-            //1.99,0.84,4.83,0.84,1.99
-            Assert.AreEqual(1.99, Math.Round(eStateIndices[0], 2));
-            Assert.AreEqual(0.84, Math.Round(eStateIndices[1], 2));
-            Assert.AreEqual(4.83, Math.Round(eStateIndices[2], 2));
-            Assert.AreEqual(0.84, Math.Round(eStateIndices[3], 2));
-            Assert.AreEqual(1.99, Math.Round(eStateIndices[4], 2));
-        }
-
-        [TestMethod]
         public void CharacteristicPolynomialTest()
         {
             var converter = new OBConversion();
             converter.SetInFormat("smi");
             var mol = new OBMol();
             converter.ReadString(mol, "CCC");
-            var adjMat = mol.AdjacencyMatrix();
+            var adjMat = new OBMolExtended(mol).AdjacencyMatrix;
             var cPoly = mol.CharacteristicPolynomial(adjMat);
             Assert.AreEqual(1d, cPoly[0]);
             Assert.AreEqual(0d, cPoly[1]);
