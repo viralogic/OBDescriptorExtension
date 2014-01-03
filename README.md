@@ -203,7 +203,7 @@ Additionally, fragment counts for 85 different fragments can be obtained. These 
 * fr_ArN ([$(a-[NX3H2]),$(a-[NH1][NH2]),$(a-C(=[OX1])[NH1][NH2]),$(a-C(=[NH])[NH2])] )
 * fr_HOCCN ([$([OX2H1][CX4][CX4H2][NX3&R1]),$([OH1][CX4][CX4H2][NX3][CX4](C)(C)C)] )
 
-## Dependencies ##
+# Dependencies #
 
 OBDescriptorExtension is dependent upon the OBDotNet library. This library is a C# port of [OpenBabel](http://openbabel.org/wiki/Main_Page).
 
