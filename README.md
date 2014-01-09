@@ -5,9 +5,9 @@
 OBDescriptorExtension is an extension of the C# port of OpenBabel (OBDotNet) that includes additional calculated cheminformatic properties
 of a given molecule. 
 
-### Calculated properties ###
+<h3 id="Features">Calculated properties / Features</h3>
 
-There are 100 new properties can be calculated using this extension library. These include:
+There are 100 new properties (**Features**) can be calculated using this extension library. These include:
 
 * Molecular Weight
 * Number Rings
@@ -110,14 +110,14 @@ There are 100 new properties can be calculated using this extension library. The
 * Ipc
 * BalabanJ
 
-### Fragments ###
+<h3 id="Fragments">Fragments</h3>
 
 Additionally, fragment counts for 85 different fragments can be obtained. These include:
 
-** Fragment Name(SMARTS Pattern) **
+**Fragment Name(SMARTS Pattern)**
 
 * fr_C=O ([CX3]=[OX1] )
-* fr_C=O_noCOO ([C!$(C-[OH])]=O )
+* fr_C=O_noCOO ([C!$(C-[OH])]=O )</li>
 * fr_Al_OH ([C!$(C=O)]-[OH] )
 * fr_Ar_OH (c[OH1] )
 * fr_methoxy ([OX2](-[#6])-[CH3] )
@@ -203,8 +203,146 @@ Additionally, fragment counts for 85 different fragments can be obtained. These 
 * fr_ArN ([$(a-[NX3H2]),$(a-[NH1][NH2]),$(a-C(=[OX1])[NH1][NH2]),$(a-C(=[NH])[NH2])] )
 * fr_HOCCN ([$([OX2H1][CX4][CX4H2][NX3&R1]),$([OH1][CX4][CX4H2][NX3][CX4](C)(C)C)] )
 
-# Dependencies #
+## Dependencies ##
 
 OBDescriptorExtension is dependent upon the OBDotNet library. This library is a C# port of [OpenBabel](http://openbabel.org/wiki/Main_Page).
 
 # Usage #
+
+[Download](https://bitbucket.org/bfenskeca/obdescriptorextension/get/a708f335cd8e.zip) the project and unzip to the directory. Load the solution using Visual Studio 2012 or greater. Check that the OBDescriptorExtension build properties are set to use the .NET Framework 4 target framework and x86 target platform and build the solution in release mode.
+
+Add the OBDotNet and OBDescriptorExtension class libraries to the References folder in your project. The OBDotNet dll is located in the Dependencies folder and the OBDescriptorExtension dll will be located in the bin folder.
+
+Import the OBDescriptor and OpenBabel namespaces at the top of your C# class file:
+
+<code>
+	using OpenBabel;<br>
+	using OBDescriptorExtension;
+</code>
+
+Additionally, when using the MolReader class, you must also import the System.Web namespace.
+
+<code>
+	using System.Web;
+</code>
+
+## Loading ##
+
+Files containing multiple molecules can be loaded:
+
+<code>
+	var mols = new MolReader("*filepath*").Open();
+</code>
+
+where <code>mols</code> is an <code>IEnumerable</code> of <code>OBMol</code> objects. Thus LINQ can be used on <code>mols</code> for further processing.
+
+Files containing a single molecule can loaded:
+
+<code>
+	var mol = new MolReader("*filepath*").GetMol();
+</code>
+
+or
+
+<code>
+	var mol = new MolReader("*filepath*").Open().FirstOrDefault();
+</code>
+
+A MolReader constructor also exists for handling web form post files.
+
+<code>
+	var mols = new MolReader(*HttpPostedFileBase uploadFile*).Open();
+</code>
+
+**Note:** Due to the lack of the OBConversion class in OBDotNet to read streams, the above method writes files to the C:/Temp directory on your system. It is up to you to clean up these files in your code. For example:
+
+<code>
+	// Instantiate MolReader object<br>
+	var reader = new MolReader(uploadFile);<br>
+	var mols = reader.Open();<br>
+	// Process the molecules. Here we will just load them into memory<br>
+	var molList = mols.ToList();<br>
+	// Clean up after yourself<br>
+	File.Delete(reader.FilePath);
+</code>
+
+All file formats that can be read by OpenBabel are compatible with the OBDescriptorExtension library.
+
+## MolDescriptor class ##
+
+The MolDescriptor class is a wrapper around the <code>OBMol</code> object. Chemical descriptors/properties  are known as **Features** and can be obtained by calling the appropriate MolDescriptor class property. For example:
+
+<code>
+	var molDescriptor = new MolDescriptor(mol); // mol is OBMol instance<br>
+	var molWeight = molDescriptor.MolWt; // getter for molecular weight<br>
+	var labuteASA = molDescriptor.LabuteASA; // getter for Labute ASA property<br>
+</code>
+
+Features can also be calculated by using the appropriate feature name as given in the list <a href="Features">above</a>.
+
+<code>
+	var feature = molDescriptor.FeatureValue("Molecular Weight");
+</code>
+
+This returns a FeatureValue object that contains the property name and value.
+
+<code>
+	var property = feature.Name; // string<br>
+	var value = feature.Value; // double
+</code>
+
+A full listing for available feature names can be obtained by:
+
+<code>
+	var propertyNames = molDescriptor.GetFeatureNames(); // string array
+</code>
+
+There are also other properties that can be obtained, such as SMILES.
+
+<code> var smiles = molDescriptor.Smiles; // getter for SMILES string</code>
+
+To obtain fragment counts:
+
+<code>
+	var fragCount = molDescriptor.FragmentCount("*smartsPattern*");
+</code>
+
+There is a preset dictionary of fragments that the MolDescriptor class calculates. To get the fragment counts for all the preset fragments, use:
+
+<code>
+	var fragments = molDescriptor.FragmentCounts; // returns "*string*" : count dictionary
+</code>
+
+The preset fragments and associated SMARTS pattern are given in the <a href="#Fragments">Fragments</a> section above.
+
+## MolDescriptorSet Class ##
+
+The MolDesriptorSet class is wrapper class around <code>IEnumerable</code> of MolDescriptors. It is used to calculate statistics for each MolDescriptor feature. This class can be used to obtain average, standard deviation, variance, median, minimum, and maximum chemical property values.
+
+<code>
+	var descriptorSet = new MolReader("mols.sdf").Open().Select(m => new MolDescriptor(m)); // IEnumerable of MolDescriptor instances<br>
+	var molSet = new MolDescriptorSet(descriptorSet);
+</code>
+
+Methods can then be called to compute aggregate values.
+
+<code>
+	molSet.Average(*FeatureName*);<br>
+	// Example<br>
+	molSet.Average("BalabanJ");<br>
+</code>
+
+To get all available statistics from all calculated properties:
+
+<code>
+	var stats = molSet.Statistics();
+</code>
+
+where stats is a <code>IEnumerable</code> of FeatureStatistics objects. Each object contains the feature name and all the calculated property values for each molecule in the set.
+
+<code>
+	var firstFeature = stats.First();<br>
+	var featureName = firstFeature.FirstName;<br>
+	var calcValues = firstFeature.Values;<br>
+	var featureMin = firstFeature.Min;<br>
+</code>
