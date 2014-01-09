@@ -146,6 +146,7 @@ namespace OBDescriptorExtension.Test
         public static readonly double Kappa3 = 0.5824;
         public static readonly double Ipc = 34.3995;
         public static readonly double BalabanJ = 3.0;
+        public static readonly string InchiKey = "UHOVQNZJYSORNB-UHFFFAOYSA-N";
     }
 
     public class Cyclosporine
@@ -506,6 +507,7 @@ namespace OBDescriptorExtension.Test
             Assert.AreEqual(Benzene.Kappa3, Math.Round(this._descriptor.Kappa3, 4));
             Assert.AreEqual(Benzene.Ipc, Math.Round(this._descriptor.Ipc, 4));
             Assert.AreEqual(Benzene.BalabanJ, Math.Round(this._descriptor.BalabanJ, 4));
+            Assert.AreEqual(Benzene.InchiKey, this._descriptor.InchiKey);
         }
 
         [TestMethod]

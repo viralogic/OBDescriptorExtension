@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OBDescriptorExtension;
 using System.IO;
 using OpenBabel;
+using System.Web;
+using Moq;
 
 namespace OBDescriptorExtension.Test
 {
@@ -29,6 +31,23 @@ namespace OBDescriptorExtension.Test
         {
             this._molCollection = new MolReader(FileNames.MultiMolFilePath).Open();
             Assert.AreEqual<int>(1597, this._molCollection.Count(), string.Format("MultiMolTest: {0} does not equal 1597", this._molCollection.Count()));
+        }
+
+        [TestMethod]
+        public void PostedFileTest()
+        {
+            using (var stream = new FileStream(FileNames.MultiMolFilePath, FileMode.Open))
+            {
+                var postedFile = new Mock<HttpPostedFileBase>();
+                postedFile.Setup(f => f.ContentLength).Returns((int)stream.Length).Verifiable();
+                postedFile.Setup(f => f.FileName).Returns(FileNames.MultiMolFilePath.Split('/').Last()).Verifiable();
+                postedFile.Setup(f => f.InputStream).Returns(stream).Verifiable();
+
+                var reader = new MolReader(postedFile.Object);
+                this._molCollection = reader.Open();
+                Assert.AreEqual<int>(1597, this._molCollection.Count(), string.Format("PostedFileTest: {0} does not equal 1597", this._molCollection.Count()));
+                File.Delete(reader.FilePath);
+            }
         }
 
         [TestMethod, ExpectedException(typeof(FileNotFoundException))]

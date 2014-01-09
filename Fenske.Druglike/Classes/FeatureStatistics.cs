@@ -32,6 +32,11 @@ namespace OBDescriptorExtension
             get { return this.FeatureValues.Name; }
         }
 
+        public IEnumerable<double> Values
+        {
+            get { return this.FeatureValues.Values; }
+        }
+
         public double Count
         {
             get 

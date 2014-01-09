@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1312.1622\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="OBDotNet, Version=0.4.0.0, Culture=neutral, PublicKeyToken=3069c9c4f488e4bd, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Fenske.Druglike\Dependencies\OBDotNet.dll</HintPath>
@@ -44,6 +47,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -74,6 +78,11 @@
     <None Include="MolFiles\cyclosporine.mol">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="Dependencies\Moq.dll" />
+    <Content Include="Dependencies\Moq.Silverlight.dll" />
+    <Content Include="Dependencies\Moq.Silverlight.xml" />
+    <Content Include="Dependencies\Moq.xml" />
+    <Content Include="Dependencies\OBDotNet.dll" />
     <Content Include="MolFiles\NotSupportedFile.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

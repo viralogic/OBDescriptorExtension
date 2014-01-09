@@ -15,6 +15,8 @@ namespace OBDescriptorExtension
 
         private OBMolExtended _mol;
         private IDictionary<string, int> _fragmentCounts;
+        private string _inchiKey;
+        private string _smiles;
         
 
         #endregion
@@ -41,9 +43,30 @@ namespace OBDescriptorExtension
         {
             get
             {
-                var converter = new OBConversion();
-                converter.SetOutFormat("smi");
-                return converter.WriteString(this.ExtendedMol.Mol).Replace(this.Title, string.Empty).Trim();
+                if (string.IsNullOrEmpty(this._smiles))
+                {
+                    var converter = new OBConversion();
+                    converter.SetOutFormat("smi");
+                    this._smiles = converter.WriteString(this.ExtendedMol.Mol).Replace(this.Title, string.Empty).Trim();
+                }
+                return this._smiles;
+            }
+        }
+
+        /// <summary>
+        /// Generates InchiKey for mol
+        /// </summary>
+        public string InchiKey
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this._inchiKey))
+                {
+                    var converter = new OBConversion();
+                    converter.SetOutFormat("inchikey");
+                    this._inchiKey = converter.WriteString(this.ExtendedMol.Mol).Trim();
+                }
+                return this._inchiKey;
             }
         }
 
