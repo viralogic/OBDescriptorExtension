@@ -215,48 +215,48 @@ Add the OBDotNet and OBDescriptorExtension class libraries to the References fol
 
 Import the OBDescriptor and OpenBabel namespaces at the top of your C# class file:
 
-<code>
+`
 	using OpenBabel;<br>
 	using OBDescriptorExtension;
-</code>
+`
 
 Additionally, when using the MolReader class, you must also import the System.Web namespace.
 
-<code>
+`
 	using System.Web;
-</code>
+`
 
 ## Loading ##
 
 Files containing multiple molecules can be loaded:
 
-<code>
+`
 	var mols = new MolReader("*filepath*").Open();
-</code>
+`
 
-where <code>mols</code> is an <code>IEnumerable</code> of <code>OBMol</code> objects. Thus LINQ can be used on <code>mols</code> for further processing.
+where `mols` is an `IEnumerable` of `OBMol` objects. Thus LINQ can be used on `mols` for further processing.
 
 Files containing a single molecule can loaded:
 
-<code>
+`
 	var mol = new MolReader("*filepath*").GetMol();
-</code>
+`
 
 or
 
-<code>
+`
 	var mol = new MolReader("*filepath*").Open().FirstOrDefault();
-</code>
+`
 
 A MolReader constructor also exists for handling web form post files.
 
-<code>
+`
 	var mols = new MolReader(*HttpPostedFileBase uploadFile*).Open();
-</code>
+`
 
 **Note:** Due to the lack of the OBConversion class in OBDotNet to read streams, the above method writes files to the C:/Temp directory on your system. It is up to you to clean up these files in your code. For example:
 
-<code>
+`
 	// Instantiate MolReader object<br>
 	var reader = new MolReader(uploadFile);<br>
 	var mols = reader.Open();<br>
@@ -264,85 +264,85 @@ A MolReader constructor also exists for handling web form post files.
 	var molList = mols.ToList();<br>
 	// Clean up after yourself<br>
 	File.Delete(reader.FilePath);
-</code>
+`
 
 All file formats that can be read by OpenBabel are compatible with the OBDescriptorExtension library.
 
 ## MolDescriptor class ##
 
-The MolDescriptor class is a wrapper around the <code>OBMol</code> object. Chemical descriptors/properties  are known as **Features** and can be obtained by calling the appropriate MolDescriptor class property. For example:
+The MolDescriptor class is a wrapper around the `OBMol` object. Chemical descriptors/properties  are known as **Features** and can be obtained by calling the appropriate MolDescriptor class property. For example:
 
-<code>
+`
 	var molDescriptor = new MolDescriptor(mol); // mol is OBMol instance<br>
 	var molWeight = molDescriptor.MolWt; // getter for molecular weight<br>
 	var labuteASA = molDescriptor.LabuteASA; // getter for Labute ASA property<br>
-</code>
+`
 
 Features can also be calculated by using the appropriate feature name as given in the list <a href="Features">above</a>.
 
-<code>
+`
 	var feature = molDescriptor.FeatureValue("Molecular Weight");
-</code>
+`
 
 This returns a FeatureValue object that contains the property name and value.
 
-<code>
+`
 	var property = feature.Name; // string<br>
 	var value = feature.Value; // double
-</code>
+`
 
 A full listing for available feature names can be obtained by:
 
-<code>
+`
 	var propertyNames = molDescriptor.GetFeatureNames(); // string array
-</code>
+`
 
 There are also other properties that can be obtained, such as SMILES.
 
-<code> var smiles = molDescriptor.Smiles; // getter for SMILES string</code>
+` var smiles = molDescriptor.Smiles; // getter for SMILES string`
 
 To obtain fragment counts:
 
-<code>
+`
 	var fragCount = molDescriptor.FragmentCount("*smartsPattern*");
-</code>
+`
 
 There is a preset dictionary of fragments that the MolDescriptor class calculates. To get the fragment counts for all the preset fragments, use:
 
-<code>
+`
 	var fragments = molDescriptor.FragmentCounts; // returns "*string*" : count dictionary
-</code>
+`
 
 The preset fragments and associated SMARTS pattern are given in the <a href="#Fragments">Fragments</a> section above.
 
 ## MolDescriptorSet Class ##
 
-The MolDesriptorSet class is wrapper class around <code>IEnumerable</code> of MolDescriptors. It is used to calculate statistics for each MolDescriptor feature. This class can be used to obtain average, standard deviation, variance, median, minimum, and maximum chemical property values.
+The MolDesriptorSet class is wrapper class around `IEnumerable` of MolDescriptors. It is used to calculate statistics for each MolDescriptor feature. This class can be used to obtain average, standard deviation, variance, median, minimum, and maximum chemical property values.
 
-<code>
+`
 	var descriptorSet = new MolReader("mols.sdf").Open().Select(m => new MolDescriptor(m)); // IEnumerable of MolDescriptor instances<br>
 	var molSet = new MolDescriptorSet(descriptorSet);
-</code>
+`
 
 Methods can then be called to compute aggregate values.
 
-<code>
+`
 	molSet.Average(*FeatureName*);<br>
 	// Example<br>
 	molSet.Average("BalabanJ");<br>
-</code>
+`
 
 To get all available statistics from all calculated properties:
 
-<code>
+`
 	var stats = molSet.Statistics();
-</code>
+`
 
-where stats is a <code>IEnumerable</code> of FeatureStatistics objects. Each object contains the feature name and all the calculated property values for each molecule in the set.
+where stats is a `IEnumerable` of FeatureStatistics objects. Each object contains the feature name and all the calculated property values for each molecule in the set.
 
-<code>
+`
 	var firstFeature = stats.First();<br>
 	var featureName = firstFeature.FirstName;<br>
 	var calcValues = firstFeature.Values;<br>
 	var featureMin = firstFeature.Min;<br>
-</code>
+`
