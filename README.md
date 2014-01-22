@@ -209,9 +209,13 @@ OBDescriptorExtension is dependent upon the OBDotNet library. This library is a 
 
 # Usage #
 
+[Install](http://openbabel.org/wiki/Category:Installation) the OpenBabel GUI Installer v 2.3.2.
+
 [Download](https://bitbucket.org/bfenskeca/obdescriptorextension/get/a708f335cd8e.zip) the project and unzip to the directory. Load the solution using Visual Studio 2012 or greater. Check that the OBDescriptorExtension build properties are set to use the .NET Framework 4 target framework and x86 target platform and build the solution in release mode.
 
 Add the OBDotNet and OBDescriptorExtension class libraries to the References folder in your project. The OBDotNet dll is located in the Dependencies folder and the OBDescriptorExtension dll will be located in the bin folder.
+
+Run all the tests in the OBDescriptorExtensionTest project. Currently, some tests will fail due to missing .mol/.sdf files in the project. This will be fixed in the future.
 
 Import the OBDescriptor and OpenBabel namespaces at the top of your C# class file:
 
